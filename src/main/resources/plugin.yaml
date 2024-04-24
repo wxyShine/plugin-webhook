@@ -1,0 +1,18 @@
+apiVersion: plugin.halo.run/v1alpha1
+kind: Plugin
+metadata:
+  name: webhook
+spec:
+  enabled: true
+  requires: ">=2.14.0"
+  author:
+    name: wxy97.com
+    website: https://www.wxy97.com/
+  logo: logo.webp
+  homepage: https://www.wxy97.com/
+  displayName: "Webhook"
+  description: "为halo提供Webhook支持!"
+  settingName: webhook-settings
+  configMapName: webhook-configmap
+  license:
+    - name: "GPL-3.0"

@@ -1,0 +1,56 @@
+package com.wxy97.webhook.strategy;
+
+import run.halo.moments.Moment;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.content.Comment;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.notification.Reason;
+import run.halo.app.extension.Extension;
+import run.halo.app.extension.Unstructured;
+
+/**
+ * Author: wxy97.com
+ * Date: 2024/4/19 09:49
+ * Description:
+ */
+@Component
+public class StrategyFactory {
+    private final Map<Class<? extends Extension>, ExtensionStrategy> strategyMap;
+    private final DefaultStrategy defaultStrategy; // 添加默认策略字段
+
+
+    public StrategyFactory(ReplyStrategy replyStrategy,
+        ReasonStrategy reasonStrategy,
+        PostStrategy postStrategy,
+        CommentStrategy commentStrategy,
+        MomentStrategy momentStrategy,
+        UnstructuredStrategy unstructuredStrategy, DefaultStrategy defaultStrategy) {
+        strategyMap = new HashMap<>();
+        strategyMap.put(Reply.class, replyStrategy);
+        strategyMap.put(Reason.class, reasonStrategy);
+        strategyMap.put(Post.class, postStrategy);
+        strategyMap.put(Comment.class, commentStrategy);
+        strategyMap.put(Unstructured.class, unstructuredStrategy);
+        strategyMap.put(Moment.class, momentStrategy);
+
+        this.defaultStrategy = defaultStrategy;
+        // Add more mappings if needed
+    }
+
+    public Optional<ExtensionStrategy> getStrategyForExtension(Extension extension) {
+        Class<? extends Extension> extensionClass = extension.getClass();
+        ExtensionStrategy strategy = strategyMap.get(extensionClass);
+
+
+        if (strategy == null) {
+            // 如果没有找到特定策略，则返回默认策略
+            return Optional.ofNullable(defaultStrategy);
+        } else {
+            return Optional.of(strategy);
+        }
+    }
+}

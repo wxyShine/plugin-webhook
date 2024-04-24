@@ -1,0 +1,32 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: webhook-settings
+spec:
+  forms:
+    - group: basic
+      label: 设置
+      formSchema:
+        - $formkit: radio
+          name: enableWebhook
+          id: enableWebhook
+          label: 是否启用webhook
+          value: false
+          options:
+            - label: 启用
+              value: true
+            - label: 关闭
+              value: false
+        - $formkit: verificationForm
+          if: $get(enableWebhook).value
+          action: /apis/wxy.halo.run/v1alpha1/webhook/sendTest
+          label: 测试webhook
+          children:
+            - $formkit: url
+              if: $get(enableWebhook).value
+              name: webhookUrl
+              label: webhook地址
+              help: 当产生事件时会向该地址推送消息,请确保你的接口支持POST请求!
+              placeholder: https://www.example.com/webhook/...
+              validation: required|url
+              value:
