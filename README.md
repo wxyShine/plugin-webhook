@@ -16,7 +16,7 @@ Webhook 是一种通过 HTTP 协议实现的回调机制，允许用户在特定
 }
 ```
 
-> 更多事件详细说明请参考使用文档: https://www.wxy97.com/archives/2135a7d6-e40a-4bae-b4a6-06db588b97aa
+> 更多事件详细说明请参考[使用文档](https://www.wxy97.com/archives/2135a7d6-e40a-4bae-b4a6-06db588b97aa) 
 
 ## ✨功能
 
@@ -28,11 +28,12 @@ Webhook 是一种通过 HTTP 协议实现的回调机制，允许用户在特定
 如何安装和配置`plugin-webhook`插件。
 
 
-1. 下载，目前提供以下下载方式：
+### 1. 下载，目前提供以下下载方式：
    GitHub Releases：访问 [Releases](https://github.com/wxyShine/plugin-webhook/releases) 下载 Assets 中的 JAR 文件。  
-   安装，插件安装和更新方式可参考：https://docs.halo.run/user-guide/plugins  
+   安装，插件安装和更新方式可[参考](https://docs.halo.run/user-guide/plugins)  
    安装完成之后，记得启用插件并完成相关配置。
-
+### 2. 应用商店安装
+   [Halo应用商店](https://www.halo.run/store/apps/app-sCQyp)
 
 ## 📒[TODO](https://github.com/wxyShine/plugin-webhook)
 - [x] TEST_WEBHOOK("测试webhook")
