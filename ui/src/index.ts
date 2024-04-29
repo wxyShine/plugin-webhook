@@ -1,7 +1,8 @@
 import { definePlugin } from "@halo-dev/console-shared";
 import HomeView from "./views/HomeView.vue";
-import { IconPlug } from "@halo-dev/components";
 import { markRaw } from "vue";
+// https://icon-sets.iconify.design/logos/webhooks/
+import LogosWebhooks from '~icons/logos/webhooks';
 
 export default definePlugin({
   components: {},
@@ -17,7 +18,7 @@ export default definePlugin({
           menu: {
             name: "Webhook",
             group: "tool",
-            icon: markRaw(IconPlug),
+            icon: markRaw(LogosWebhooks),
             priority: 0,
           },
         },

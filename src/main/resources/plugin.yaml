@@ -8,11 +8,14 @@ spec:
   author:
     name: wxy97.com
     website: https://www.wxy97.com/
-  logo: logo.webp
+  logo: https://cdn.wxy97.com/blog/2023-12-27-nzizpjaz.webp
   homepage: https://www.wxy97.com/
+  repo: https://github.com/wxyShine/plugin-webhook
+  issues: https://github.com/wxyShine/plugin-webhook/issues
   displayName: "Webhook"
   description: "为halo提供Webhook支持!"
   settingName: webhook-settings
   configMapName: webhook-configmap
   license:
     - name: "GPL-3.0"
+      url: "https://github.com/wxyShine/plugin-webhook/blob/main/LICENSE"
