@@ -43,6 +43,7 @@ Webhook 是一种通过 HTTP 协议实现的回调机制，允许用户在特定
 - [x]  DELETE_COMMENT("删除评论")
 - [x]  REPLY_COMMENT("回复评论")
 - [x]  DELETE_REPLY_COMMENT("删除回复")
+- [x]  NEW_DEVICE_LOGIN("新设备登录");
 - [ ]  发布瞬间
 - [ ]  删除瞬间
 - [ ]  可配置事件
