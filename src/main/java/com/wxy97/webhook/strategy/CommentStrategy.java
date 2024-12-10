@@ -2,6 +2,7 @@ package com.wxy97.webhook.strategy;
 
 import com.wxy97.webhook.bean.BaseBody;
 import com.wxy97.webhook.bean.CommentData;
+import com.wxy97.webhook.bean.PluginData;
 import com.wxy97.webhook.bean.PostData;
 import com.wxy97.webhook.bean.SinglePageData;
 import com.wxy97.webhook.enums.WebhookEventEnum;
@@ -34,7 +35,6 @@ public class CommentStrategy implements ExtensionStrategy {
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
         Comment comment = (Comment) extension;
-
         switch (eventType) {
             case ADDED:
                 handleAddedEvent(comment, webhookUrl);
@@ -49,6 +49,17 @@ public class CommentStrategy implements ExtensionStrategy {
     private void handleAddedEvent(Comment comment, String webhookUrl) {
         String refName = comment.getSpec().getSubjectRef().getName();
         String refKind = comment.getSpec().getSubjectRef().getKind();
+
+        // 单独处理友链插件评论
+        if ("PluginLinks".equals(refName)) {
+            BaseBody<CommentData> baseBody = createBaseBody(comment,null);
+            baseBody.setHookTime(DateUtil.formatNow());
+            baseBody.getData().setPluginData(new PluginData("PluginLinks"));
+            baseBody.setEventTypeName(WebhookEventEnum.NEW_COMMENT.getDescription());
+            baseBody.setEventType(WebhookEventEnum.NEW_COMMENT);
+            WebhookSender.sendWebhook(webhookUrl, baseBody);
+            return;
+        }
 
         Mono.defer(() -> fetchObject(refKind, refName))
             .subscribe(object -> {
@@ -66,6 +77,18 @@ public class CommentStrategy implements ExtensionStrategy {
         if (!Objects.isNull(deletionTimestamp)) {
             String refKind = comment.getSpec().getSubjectRef().getKind();
             String refName = comment.getSpec().getSubjectRef().getName();
+
+
+            // 单独处理友链插件评论
+            if ("PluginLinks".equals(refName)) {
+                BaseBody<CommentData> baseBody = createBaseBody(comment,null);
+                baseBody.setHookTime(DateUtil.formatNow());
+                baseBody.getData().setPluginData(new PluginData("PluginLinks"));
+                baseBody.setEventTypeName(WebhookEventEnum.DELETE_COMMENT.getDescription());
+                baseBody.setEventType(WebhookEventEnum.DELETE_COMMENT);
+                WebhookSender.sendWebhook(webhookUrl, baseBody);
+                return;
+            }
 
             Mono.defer(() -> fetchObject(refKind, refName))
                 .map(object -> {

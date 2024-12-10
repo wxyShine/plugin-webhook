@@ -28,6 +28,8 @@ public class CommentData {
 
     private SinglePageData singlePageData;
 
+    private PluginData pluginData;
+
     private CommentData replyComment;
 
 
