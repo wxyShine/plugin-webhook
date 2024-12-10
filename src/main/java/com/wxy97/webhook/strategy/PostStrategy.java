@@ -28,11 +28,12 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @RequiredArgsConstructor
 public class PostStrategy implements ExtensionStrategy {
 
+    public static final String KIND = "Post";
 
 
     @Override
     public void process(ExtensionChangedEvent event,
-        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+                        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
 
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
@@ -83,7 +84,8 @@ public class PostStrategy implements ExtensionStrategy {
                     postData.setTitle(newPost.getSpec().getTitle());
                     postData.setOwner(newPost.getSpec().getOwner());
                     postData.setSlug(newPost.getSpec().getSlug());
-                    postData.setCreateTime(DateUtil.format(newPost.getMetadata().getCreationTimestamp()));
+                    postData.setCreateTime(
+                        DateUtil.format(newPost.getMetadata().getCreationTimestamp()));
                     postData.setPublishTime(DateUtil.format(newPost.getSpec().getPublishTime()));
                     postData.setPermalink(newPost.getStatus().getPermalink());
                     postData.setVisible(newPost.getSpec().getVisible().name());
@@ -94,8 +96,14 @@ public class PostStrategy implements ExtensionStrategy {
                     // 删除到（回收站）finalizers=[post-protection]
                     // 永久删除 finalizers=[]
                     postData.setIsPermanent(!Objects.isNull(deletionTimestamp));
+
+                    // 是否恢复文章
+                    Boolean deleted = newPost.getSpec().getDeleted();
+                    postData.setIsRestore(!deleted);
+
                     baseBody.get().setHookTime(DateUtil.formatNow());
                     WebhookSender.sendWebhook(webhookUrl, baseBody);
+
                 }
             }
 
@@ -110,7 +118,8 @@ public class PostStrategy implements ExtensionStrategy {
      * 且 getSpec().getPublish()是true就是文章发布
      */
     private boolean isNewArticle(Post newPost) {
-        String lastReleaseSnapshot = newPost.getMetadata().getAnnotations().get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+        String lastReleaseSnapshot =
+            newPost.getMetadata().getAnnotations().get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
         String expectReleaseSnapshot = newPost.getSpec().getReleaseSnapshot();
         Boolean newPublish = newPost.getSpec().getPublish();
         return !Objects.equals(expectReleaseSnapshot, lastReleaseSnapshot) && newPublish;

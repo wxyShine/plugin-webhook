@@ -27,6 +27,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @RequiredArgsConstructor
 public class ReplyStrategy implements ExtensionStrategy {
 
+    public static final String KIND = "Reply";
+
     private final ReactiveExtensionClient reactiveExtensionClient;
 
 

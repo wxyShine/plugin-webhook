@@ -1,8 +1,9 @@
 package com.wxy97.webhook.strategy;
 
-import run.halo.moments.Moment;
+import com.wxy97.webhook.watch.ExtensionChangedEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Comment;
@@ -19,32 +20,31 @@ import run.halo.app.extension.Unstructured;
  */
 @Component
 public class StrategyFactory {
-    private final Map<Class<? extends Extension>, ExtensionStrategy> strategyMap;
+    private final Map<String, ExtensionStrategy> strategyMap;
     private final DefaultStrategy defaultStrategy; // 添加默认策略字段
 
 
     public StrategyFactory(ReplyStrategy replyStrategy,
-        ReasonStrategy reasonStrategy,
-        PostStrategy postStrategy,
-        CommentStrategy commentStrategy,
-        MomentStrategy momentStrategy,
-        UnstructuredStrategy unstructuredStrategy, DefaultStrategy defaultStrategy) {
+                           ReasonStrategy reasonStrategy,
+                           PostStrategy postStrategy,
+                           CommentStrategy commentStrategy,
+                           UnstructuredStrategy unstructuredStrategy,
+                           DeviceStrategy deviceStrategy,
+                           DefaultStrategy defaultStrategy) {
         strategyMap = new HashMap<>();
-        strategyMap.put(Reply.class, replyStrategy);
-        strategyMap.put(Reason.class, reasonStrategy);
-        strategyMap.put(Post.class, postStrategy);
-        strategyMap.put(Comment.class, commentStrategy);
-        strategyMap.put(Unstructured.class, unstructuredStrategy);
-        strategyMap.put(Moment.class, momentStrategy);
+        strategyMap.put(ReplyStrategy.KIND, replyStrategy);
+        strategyMap.put(ReasonStrategy.KIND, reasonStrategy);
+        strategyMap.put(PostStrategy.KIND, postStrategy);
+        strategyMap.put(CommentStrategy.KIND, commentStrategy);
+        strategyMap.put(UnstructuredStrategy.KIND, unstructuredStrategy);
+        strategyMap.put(DeviceStrategy.KIND, deviceStrategy);
 
         this.defaultStrategy = defaultStrategy;
         // Add more mappings if needed
     }
 
-    public Optional<ExtensionStrategy> getStrategyForExtension(Extension extension) {
-        Class<? extends Extension> extensionClass = extension.getClass();
-        ExtensionStrategy strategy = strategyMap.get(extensionClass);
-
+    public Optional<ExtensionStrategy> getStrategyForKind(String kind) {
+        ExtensionStrategy strategy = strategyMap.get(kind);
 
         if (strategy == null) {
             // 如果没有找到特定策略，则返回默认策略
@@ -52,5 +52,7 @@ public class StrategyFactory {
         } else {
             return Optional.of(strategy);
         }
+
+
     }
 }

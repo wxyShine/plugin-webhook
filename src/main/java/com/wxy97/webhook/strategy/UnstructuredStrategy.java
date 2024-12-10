@@ -15,6 +15,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @RequiredArgsConstructor
 public class UnstructuredStrategy implements ExtensionStrategy {
 
+    public static final String KIND = "Unstructured";
+
 
     @Override
     public void process(ExtensionChangedEvent event,

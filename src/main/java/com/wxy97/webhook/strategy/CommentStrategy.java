@@ -24,6 +24,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CommentStrategy implements ExtensionStrategy {
 
+    public static final String KIND = "Comment";
+
     private final ReactiveExtensionClient reactiveExtensionClient;
 
     @Override

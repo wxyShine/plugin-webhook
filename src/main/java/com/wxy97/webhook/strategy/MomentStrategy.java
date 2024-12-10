@@ -15,6 +15,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @RequiredArgsConstructor
 public class MomentStrategy implements ExtensionStrategy {
 
+    public static String KIND_NAME = "Moment";
+
 
     @Override
     public void process(ExtensionChangedEvent event,

@@ -30,6 +30,10 @@ public class PostData {
      * true 永久删除, false 删除到回收站
      */
     private Boolean isPermanent;
+    /**
+     * true 恢复文章
+     */
+    private Boolean isRestore;
 
     public static PostData convertToPostData(Post post) {
         PostData postData = new PostData();

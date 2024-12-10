@@ -16,6 +16,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @RequiredArgsConstructor
 public class ReasonStrategy implements ExtensionStrategy {
 
+    public static final String KIND = "Reason";
 
     @Override
     public void process(ExtensionChangedEvent event,

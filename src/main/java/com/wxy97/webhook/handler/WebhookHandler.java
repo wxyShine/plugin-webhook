@@ -37,15 +37,17 @@ public class WebhookHandler implements ApplicationListener<ExtensionChangedEvent
     public void onApplicationEvent(@NonNull ExtensionChangedEvent event) {
         Assert.state(!Schedulers.isInNonBlockingThread(),
             "Must be called in a non-reactive thread.");
-        Extension extension = null;
+        Extension extension;
         if (event.getExtension() != null) {
             extension = event.getExtension();
-        } else if (event.getOldExtension() != null) {
-            extension = event.getOldExtension();
+       /* } else if (event.getOldExtension() != null) {
+            extension = event.getOldExtension();*/
         } else {
+            extension = null;
             return;
         }
-        log.info("Extension [{}] triggered the [{}] event.", extension.getClass(),
+        String kind = extension.getKind();
+        log.info("Kind [{}]  the [{}] event.", kind,
             event.getEventType());
 
         settingFetcher.fetch("basic", BasicSetting.class)
@@ -55,7 +57,7 @@ public class WebhookHandler implements ApplicationListener<ExtensionChangedEvent
 
                 if (enableWebhook) {
                     Optional<ExtensionStrategy> optionalStrategy =
-                        strategyFactory.getStrategyForExtension(event.getExtension());
+                        strategyFactory.getStrategyForKind(kind);
                     if (optionalStrategy.isPresent()) {
                         ExtensionStrategy strategy = optionalStrategy.get();
                         strategy.process(event, reactiveExtensionClient, webhookUrl);

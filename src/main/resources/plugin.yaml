@@ -4,7 +4,7 @@ metadata:
   name: webhook
 spec:
   enabled: true
-  requires: ">=2.14.0"
+  requires: ">=2.20.0"
   author:
     name: wxy97.com
     website: https://www.wxy97.com/

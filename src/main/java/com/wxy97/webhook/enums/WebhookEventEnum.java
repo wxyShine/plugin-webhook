@@ -17,7 +17,9 @@ public enum WebhookEventEnum {
     NEW_COMMENT("发表评论"),
     DELETE_COMMENT("删除评论"),
     REPLY_COMMENT("回复评论"),
-    DELETE_REPLY_COMMENT("删除回复");
+    DELETE_REPLY_COMMENT("删除回复"),
+
+    NEW_DEVICE_LOGIN("新设备登录");
 
     private final String description;
 
