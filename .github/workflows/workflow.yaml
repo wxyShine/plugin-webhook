@@ -29,6 +29,11 @@ jobs:
         with:
           version: 8
           run_install: true
+      - name: Clean node_modules and Install Frontend Dependencies
+        run: |
+          rm -rf node_modules
+          pnpm install
+    
       - name: Install Frontend Dependencies
         run: |
           chmod +x ./gradlew
