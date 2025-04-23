@@ -1,17 +1,10 @@
 package com.wxy97.webhook.strategy;
 
-import com.wxy97.webhook.watch.ExtensionChangedEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import run.halo.app.core.extension.content.Comment;
-import run.halo.app.core.extension.content.Post;
-import run.halo.app.core.extension.content.Reply;
-import run.halo.app.core.extension.notification.Reason;
-import run.halo.app.extension.Extension;
-import run.halo.app.extension.Unstructured;
 
 /**
  * Author: wxy97.com
@@ -20,39 +13,22 @@ import run.halo.app.extension.Unstructured;
  */
 @Component
 public class StrategyFactory {
-    private final Map<String, ExtensionStrategy> strategyMap;
-    private final DefaultStrategy defaultStrategy; // 添加默认策略字段
 
+    private final Map<String, ExtensionStrategy> strategyMap = new HashMap<>();
+    private final DefaultStrategy defaultStrategy;
 
-    public StrategyFactory(ReplyStrategy replyStrategy,
-                           ReasonStrategy reasonStrategy,
-                           PostStrategy postStrategy,
-                           CommentStrategy commentStrategy,
-                           UnstructuredStrategy unstructuredStrategy,
-                           DeviceStrategy deviceStrategy,
-                           DefaultStrategy defaultStrategy) {
-        strategyMap = new HashMap<>();
-        strategyMap.put(ReplyStrategy.KIND, replyStrategy);
-        strategyMap.put(ReasonStrategy.KIND, reasonStrategy);
-        strategyMap.put(PostStrategy.KIND, postStrategy);
-        strategyMap.put(CommentStrategy.KIND, commentStrategy);
-        strategyMap.put(UnstructuredStrategy.KIND, unstructuredStrategy);
-        strategyMap.put(DeviceStrategy.KIND, deviceStrategy);
-
+    @Autowired
+    public StrategyFactory(List<ExtensionStrategy> strategies, DefaultStrategy defaultStrategy) {
+        for (ExtensionStrategy strategy : strategies) {
+            StrategyKind annotation = strategy.getClass().getAnnotation(StrategyKind.class);
+            if (annotation != null) {
+                strategyMap.put(annotation.value(), strategy);
+            }
+        }
         this.defaultStrategy = defaultStrategy;
-        // Add more mappings if needed
     }
 
-    public Optional<ExtensionStrategy> getStrategyForKind(String kind) {
-        ExtensionStrategy strategy = strategyMap.get(kind);
-
-        if (strategy == null) {
-            // 如果没有找到特定策略，则返回默认策略
-            return Optional.ofNullable(defaultStrategy);
-        } else {
-            return Optional.of(strategy);
-        }
-
-
+    public ExtensionStrategy getStrategyForKind(String kind) {
+        return strategyMap.getOrDefault(kind, defaultStrategy);
     }
 }

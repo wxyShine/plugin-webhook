@@ -15,7 +15,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 public class DefaultStrategy implements ExtensionStrategy{
     @Override
     public void process(ExtensionChangedEvent event,
-        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+        ReactiveExtensionClient reactiveExtensionClient) {
 
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
@@ -25,7 +25,7 @@ public class DefaultStrategy implements ExtensionStrategy{
         optionalExtension.ifPresent(ext -> {
             String kind = ext.getKind();
             // 后续逻辑
-            if (("Moment").equals(kind) && ExtensionChangedEvent.EventType.UPDATED.equals(eventType)) {
+            if (("Moment").equals(kind) && ExtensionChangedEvent.EventType.ADDED.equals(eventType)) {
                 System.out.println("发布瞬间了");
             }
         });

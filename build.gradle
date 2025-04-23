@@ -38,6 +38,7 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
 }
 
+/*
 node {
     nodeProjectDir = file("${project.projectDir}/ui")
 }
@@ -49,18 +50,18 @@ tasks.register('buildFrontend', PnpmTask) {
 
 tasks.register('installDepsForUI', PnpmTask) {
     args = ['install']
-}
+}*/
 
 build {
     // build frontend before build
     tasks.named('compileJava').configure {
-        dependsOn('buildFrontend')
+//        dependsOn('buildFrontend')
     }
 }
 
 halo {
     version = '2.20'
-    superAdminUsername = 'wxy'
+    superAdminUsername = 'wxytest'
     superAdminPassword = '123456'
     externalUrl = 'http://localhost:8090'
     port = 8090

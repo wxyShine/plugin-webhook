@@ -4,6 +4,8 @@ import com.wxy97.webhook.config.BasicSetting;
 import com.wxy97.webhook.strategy.ExtensionStrategy;
 import com.wxy97.webhook.strategy.StrategyFactory;
 import com.wxy97.webhook.watch.ExtensionChangedEvent;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.util.Assert;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.plugin.ReactiveSettingFetcher;
 import run.halo.app.plugin.SettingFetcher;
 
 /**
@@ -29,7 +32,8 @@ import run.halo.app.plugin.SettingFetcher;
 @RequiredArgsConstructor
 public class WebhookHandler implements ApplicationListener<ExtensionChangedEvent> {
 
-    private final SettingFetcher settingFetcher;
+    private final ReactiveSettingFetcher reactiveSettingFetcher;
+
     private final ReactiveExtensionClient reactiveExtensionClient;
     private final StrategyFactory strategyFactory;
 
@@ -37,33 +41,20 @@ public class WebhookHandler implements ApplicationListener<ExtensionChangedEvent
     public void onApplicationEvent(@NonNull ExtensionChangedEvent event) {
         Assert.state(!Schedulers.isInNonBlockingThread(),
             "Must be called in a non-reactive thread.");
-        Extension extension;
-        if (event.getExtension() != null) {
-            extension = event.getExtension();
-       /* } else if (event.getOldExtension() != null) {
-            extension = event.getOldExtension();*/
-        } else {
-            extension = null;
+
+        Extension extension = event.getExtension();
+        if (extension == null) {
             return;
         }
+
         String kind = extension.getKind();
-        log.info("Kind [{}]  the [{}] event.", kind,
-            event.getEventType());
+        log.debug("Kind [{}] triggered [{}] event.", kind, event.getEventType());
 
-        settingFetcher.fetch("basic", BasicSetting.class)
-            .ifPresent(basicSetting -> {
-                var webhookUrl = basicSetting.getWebhookUrl();
-                var enableWebhook = basicSetting.getEnableWebhook();
-
-                if (enableWebhook) {
-                    Optional<ExtensionStrategy> optionalStrategy =
-                        strategyFactory.getStrategyForKind(kind);
-                    if (optionalStrategy.isPresent()) {
-                        ExtensionStrategy strategy = optionalStrategy.get();
-                        strategy.process(event, reactiveExtensionClient, webhookUrl);
-                    }
-                }
-            });
+        reactiveSettingFetcher.fetch("basic", BasicSetting.class).doOnNext(setting -> {
+            if (setting.getEnableWebhook()) {
+                ExtensionStrategy strategy = strategyFactory.getStrategyForKind(kind);
+                strategy.process(event, reactiveExtensionClient);
+            }
+        }).subscribe();
     }
-
 }

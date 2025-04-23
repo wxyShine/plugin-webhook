@@ -9,6 +9,5 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * Description:
  */
 public interface ExtensionStrategy {
-    void process(ExtensionChangedEvent event, ReactiveExtensionClient reactiveExtensionClient,
-        String webhookUrl);
+    void process(ExtensionChangedEvent event, ReactiveExtensionClient reactiveExtensionClient);
 }

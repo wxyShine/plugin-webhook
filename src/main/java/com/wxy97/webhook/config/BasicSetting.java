@@ -1,5 +1,7 @@
 package com.wxy97.webhook.config;
 
+import java.util.List;
+import java.util.Map;
 import lombok.Data;
 
 /**
@@ -15,4 +17,6 @@ public class BasicSetting {
     private Boolean enableWebhook;
 
     private String webhookUrl;
+
+    private List<Map<String, Object>> headers;
 }

@@ -6,6 +6,7 @@ import com.wxy97.webhook.enums.WebhookEventEnum;
 import com.wxy97.webhook.util.DateUtil;
 import com.wxy97.webhook.util.WebhookSender;
 import com.wxy97.webhook.watch.ExtensionChangedEvent;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Device;
 import run.halo.app.extension.Extension;
@@ -16,14 +17,16 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * Date: 2024/4/19 10:41
  * Description:
  */
+@StrategyKind("Device")
 @Component
+@RequiredArgsConstructor
 public class DeviceStrategy implements ExtensionStrategy {
 
-    public static final String KIND = "Device";
+    private final WebhookSender webhookSender;
 
     @Override
     public void process(ExtensionChangedEvent event,
-                        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+                        ReactiveExtensionClient reactiveExtensionClient) {
 
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
@@ -44,7 +47,7 @@ public class DeviceStrategy implements ExtensionStrategy {
             baseBody.setEventType(WebhookEventEnum.NEW_DEVICE_LOGIN);
             baseBody.setEventTypeName(WebhookEventEnum.NEW_DEVICE_LOGIN.getDescription());
             baseBody.setHookTime(DateUtil.formatNow());
-            WebhookSender.sendWebhook(webhookUrl, baseBody);
+            webhookSender.sendWebhook(baseBody);
         }
 
     }

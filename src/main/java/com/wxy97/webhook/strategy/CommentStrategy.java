@@ -21,43 +21,44 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import java.time.Instant;
 import java.util.Objects;
 
+@StrategyKind("Comment")
 @Component
 @RequiredArgsConstructor
 public class CommentStrategy implements ExtensionStrategy {
 
-    public static final String KIND = "Comment";
-
     private final ReactiveExtensionClient reactiveExtensionClient;
+    private final WebhookSender webhookSender;
+
 
     @Override
     public void process(ExtensionChangedEvent event,
-        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+                        ReactiveExtensionClient reactiveExtensionClient) {
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
         Comment comment = (Comment) extension;
         switch (eventType) {
             case ADDED:
-                handleAddedEvent(comment, webhookUrl);
+                handleAddedEvent(comment);
                 break;
             case UPDATED:
-                handleUpdatedEvent(comment, webhookUrl);
+                handleUpdatedEvent(comment);
                 break;
             default:
         }
     }
 
-    private void handleAddedEvent(Comment comment, String webhookUrl) {
+    private void handleAddedEvent(Comment comment) {
         String refName = comment.getSpec().getSubjectRef().getName();
         String refKind = comment.getSpec().getSubjectRef().getKind();
 
         // 单独处理友链插件评论
         if ("PluginLinks".equals(refName)) {
-            BaseBody<CommentData> baseBody = createBaseBody(comment,null);
+            BaseBody<CommentData> baseBody = createBaseBody(comment, null);
             baseBody.setHookTime(DateUtil.formatNow());
             baseBody.getData().setPluginData(new PluginData("PluginLinks"));
             baseBody.setEventTypeName(WebhookEventEnum.NEW_COMMENT.getDescription());
             baseBody.setEventType(WebhookEventEnum.NEW_COMMENT);
-            WebhookSender.sendWebhook(webhookUrl, baseBody);
+            webhookSender.sendWebhook(baseBody);
             return;
         }
 
@@ -67,12 +68,12 @@ public class CommentStrategy implements ExtensionStrategy {
                     BaseBody<CommentData> baseBody = createBaseBody(comment, object);
                     baseBody.setEventTypeName(WebhookEventEnum.NEW_COMMENT.getDescription());
                     baseBody.setEventType(WebhookEventEnum.NEW_COMMENT);
-                    WebhookSender.sendWebhook(webhookUrl, baseBody);
+                    webhookSender.sendWebhook(baseBody);
                 }
             });
     }
 
-    private void handleUpdatedEvent(Comment comment, String webhookUrl) {
+    private void handleUpdatedEvent(Comment comment) {
         Instant deletionTimestamp = comment.getMetadata().getDeletionTimestamp();
         if (!Objects.isNull(deletionTimestamp)) {
             String refKind = comment.getSpec().getSubjectRef().getKind();
@@ -81,12 +82,12 @@ public class CommentStrategy implements ExtensionStrategy {
 
             // 单独处理友链插件评论
             if ("PluginLinks".equals(refName)) {
-                BaseBody<CommentData> baseBody = createBaseBody(comment,null);
+                BaseBody<CommentData> baseBody = createBaseBody(comment, null);
                 baseBody.setHookTime(DateUtil.formatNow());
                 baseBody.getData().setPluginData(new PluginData("PluginLinks"));
                 baseBody.setEventTypeName(WebhookEventEnum.DELETE_COMMENT.getDescription());
                 baseBody.setEventType(WebhookEventEnum.DELETE_COMMENT);
-                WebhookSender.sendWebhook(webhookUrl, baseBody);
+                webhookSender.sendWebhook(baseBody);
                 return;
             }
 
@@ -95,7 +96,7 @@ public class CommentStrategy implements ExtensionStrategy {
                     BaseBody<CommentData> baseBody = createBaseBody(comment, object);
                     baseBody.setEventTypeName(WebhookEventEnum.DELETE_COMMENT.getDescription());
                     baseBody.setEventType(WebhookEventEnum.DELETE_COMMENT);
-                    WebhookSender.sendWebhook(webhookUrl, baseBody);
+                    webhookSender.sendWebhook(baseBody);
                     return object;
                 })
                 .subscribe();

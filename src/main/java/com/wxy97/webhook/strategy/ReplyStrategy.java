@@ -23,18 +23,19 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * Date: 2024/4/19 09:54
  * Description:
  */
+@StrategyKind("Reply")
 @Component
 @RequiredArgsConstructor
 public class ReplyStrategy implements ExtensionStrategy {
 
-    public static final String KIND = "Reply";
 
     private final ReactiveExtensionClient reactiveExtensionClient;
+    private final WebhookSender webhookSender;
 
 
     @Override
     public void process(ExtensionChangedEvent event,
-        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+                        ReactiveExtensionClient reactiveExtensionClient) {
 
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
@@ -56,13 +57,13 @@ public class ReplyStrategy implements ExtensionStrategy {
                                 baseBody.setEventTypeName(
                                     WebhookEventEnum.REPLY_COMMENT.getDescription());
                                 baseBody.setEventType(WebhookEventEnum.REPLY_COMMENT);
-                                WebhookSender.sendWebhook(webhookUrl, baseBody);
+                                webhookSender.sendWebhook(baseBody);
                             }
                         });
                 });
                 break;
             case UPDATED:
-                if (reply.getMetadata().getDeletionTimestamp() !=null){
+                if (reply.getMetadata().getDeletionTimestamp() != null) {
                     reactiveExtensionClient.fetch(Comment.class, commentName).subscribe(comment -> {
                         String refName = comment.getSpec().getSubjectRef().getName();
                         String refKind = comment.getSpec().getSubjectRef().getKind();
@@ -74,7 +75,7 @@ public class ReplyStrategy implements ExtensionStrategy {
                                     baseBody.setEventTypeName(
                                         WebhookEventEnum.DELETE_REPLY_COMMENT.getDescription());
                                     baseBody.setEventType(WebhookEventEnum.DELETE_REPLY_COMMENT);
-                                    WebhookSender.sendWebhook(webhookUrl, baseBody);
+                                    webhookSender.sendWebhook(baseBody);
                                 }
                             });
                     });

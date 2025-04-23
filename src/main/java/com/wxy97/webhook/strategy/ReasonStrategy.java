@@ -12,15 +12,15 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * Date: 2024/4/19 09:54
  * Description:
  */
+@StrategyKind("Reason")
 @Component
 @RequiredArgsConstructor
 public class ReasonStrategy implements ExtensionStrategy {
 
-    public static final String KIND = "Reason";
 
     @Override
     public void process(ExtensionChangedEvent event,
-        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+        ReactiveExtensionClient reactiveExtensionClient) {
 
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();

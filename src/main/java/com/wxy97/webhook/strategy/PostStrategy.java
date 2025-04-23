@@ -24,16 +24,17 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * Date: 2024/4/19 09:54
  * Description:
  */
+@StrategyKind("Post")
 @Component
 @RequiredArgsConstructor
 public class PostStrategy implements ExtensionStrategy {
 
-    public static final String KIND = "Post";
+    private final WebhookSender webhookSender;
 
 
     @Override
     public void process(ExtensionChangedEvent event,
-                        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+                        ReactiveExtensionClient reactiveExtensionClient) {
 
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
@@ -46,7 +47,7 @@ public class PostStrategy implements ExtensionStrategy {
 
                 Mono<Post> fetch =
                     reactiveExtensionClient.fetch(Post.class, newPost.getMetadata().getName());
-                fetch.delaySubscription(Duration.ofSeconds(3)).subscribe(
+                fetch.delayElement(Duration.ofSeconds(3)).subscribe(
                     post -> {
                         // 处理获取到的 Post 对象
                         baseBody.set(new BaseBody<>());
@@ -64,7 +65,7 @@ public class PostStrategy implements ExtensionStrategy {
                         baseBody.get().setEventType(WebhookEventEnum.NEW_POST);
                         baseBody.get().setEventTypeName(WebhookEventEnum.NEW_POST.getDescription());
                         baseBody.get().setHookTime(DateUtil.formatNow());
-                        WebhookSender.sendWebhook(webhookUrl, baseBody);
+                        webhookSender.sendWebhook(baseBody);
                     });
             }
 
@@ -102,7 +103,7 @@ public class PostStrategy implements ExtensionStrategy {
                     postData.setIsRestore(!deleted);
 
                     baseBody.get().setHookTime(DateUtil.formatNow());
-                    WebhookSender.sendWebhook(webhookUrl, baseBody);
+                    webhookSender.sendWebhook(baseBody);
 
                 }
             }

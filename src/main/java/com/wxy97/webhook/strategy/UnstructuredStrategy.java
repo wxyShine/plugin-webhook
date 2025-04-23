@@ -11,16 +11,15 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * Date: 2024/4/19 09:55
  * Description:
  */
+@StrategyKind("Unstructured")
 @Component
 @RequiredArgsConstructor
 public class UnstructuredStrategy implements ExtensionStrategy {
 
-    public static final String KIND = "Unstructured";
-
 
     @Override
     public void process(ExtensionChangedEvent event,
-        ReactiveExtensionClient reactiveExtensionClient, String webhookUrl) {
+                        ReactiveExtensionClient reactiveExtensionClient) {
 
         Extension extension = event.getExtension();
         ExtensionChangedEvent.EventType eventType = event.getEventType();
