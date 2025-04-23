@@ -34,7 +34,8 @@ import run.halo.app.plugin.SettingFetcher;
 @AllArgsConstructor
 public class WebhookController {
 
-    private final WebhookSender webhookSender;
+    private final WebClient.Builder webClientBuilder;
+
 
     @PostMapping("/sendTest")
     public Mono<Void> test(@RequestBody BasicSetting basicSetting) {
@@ -43,7 +44,28 @@ public class WebhookController {
         baseBody.setEventTypeName(WebhookEventEnum.TEST_WEBHOOK.getDescription());
         baseBody.setData("Test webhook success");
         baseBody.setHookTime(DateUtil.formatNow());
-        webhookSender.sendWebhook(baseBody);
-        return Mono.empty();
+
+        return webClientBuilder.build().post()
+            .uri(basicSetting.getWebhookUrl())
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(baseBody)
+            .headers(httpHeaders -> {
+                // 加头
+                if (basicSetting.getHeaders() != null) {
+                    basicSetting.getHeaders().forEach(h -> {
+                        String name = String.valueOf(h.get("name"));
+                        String value = String.valueOf(h.get("value"));
+                        httpHeaders.add(name, value);
+                    });
+                }
+            })
+            .retrieve()
+            .bodyToMono(Void.class)
+            .onErrorResume(WebClientException.class, error -> {
+                // 处理请求失败的情况
+                return Mono.error(
+                    new ServerWebInputException("Webhook 测试失败: " + error.getMessage()));
+            })
+            .then();
     }
 }
