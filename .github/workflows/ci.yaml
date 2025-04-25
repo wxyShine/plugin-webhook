@@ -10,10 +10,5 @@ on:
 
 jobs:
   ci:
-    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-ci.yaml@v1
-    with:
-      node-version: "20"
-      pnpm-version: "9"
-      ui-path: "ui"
-
-
+    # Suggest using stable branch, tag or sha.
+    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-ci.yaml@v3

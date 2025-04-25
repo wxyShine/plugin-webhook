@@ -1,0 +1,18 @@
+name: CD
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  cd:
+    # Suggest using stable branch, tag or sha.
+    uses: halo-sigs/reusable-workflows/.github/workflows/plugin-cd.yaml@v3
+    secrets:
+      halo-pat: ${{ secrets.HALO_PAT }}
+    permissions:
+      contents: write
+    with:
+      # This is required for releasing to Halo App Store.
+      app-id: app-sCQyp
