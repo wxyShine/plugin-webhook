@@ -4,8 +4,6 @@ on:
   release:
     types:
       - published
-  workflow_dispatch: # ✅ 手动触发支持
-
 
 jobs:
   cd:
